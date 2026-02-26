@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.mermaid-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.datasheet-wrapper {
+  overflow: hidden;
+}
+
+.datasheet-wrapper .dsg-container {
+  font-size: 13px;
+}
+
+.dsg-select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  padding: 0 8px;
+  cursor: pointer;
+  appearance: menulist;
+}
+
+.dsg-select-display {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 13px;
+}
