@@ -88,6 +88,28 @@ Download the latest release for your platform:
 | Styling | Tailwind CSS | 4.x |
 | Icons | Lucide React | 0.469 |
 
+## Installation
+
+### macOS
+
+1. Download `.dmg` from [Releases](https://github.com/SimWook/workflow-visualizer/releases/latest)
+2. Open the `.dmg` and drag the app to Applications
+3. **Important**: Since the app is not code-signed, macOS Gatekeeper will block it. Run this command to remove the quarantine attribute:
+
+```bash
+xattr -cr "/Applications/Workflow Visualizer.app"
+```
+
+4. Now you can open the app normally
+
+> If you see **"Workflow Visualizer is damaged and can't be opened"**, this is expected for unsigned apps downloaded from the internet. The `xattr -cr` command above resolves this.
+
+### Windows
+
+1. Download `.msi` or `.exe` from [Releases](https://github.com/SimWook/workflow-visualizer/releases/latest)
+2. Run the installer
+3. If Windows SmartScreen shows a warning, click "More info" → "Run anyway"
+
 ## Development
 
 ### Prerequisites
@@ -278,6 +300,28 @@ Workflow Visualizer は、Excelのような表形式のインターフェース�
 | **Windows** | `.msi` / `.exe` | x86_64 |
 
 👉 [**最新版をダウンロード**](https://github.com/SimWook/workflow-visualizer/releases/latest)
+
+### インストール方法
+
+#### macOS
+
+1. [Releases](https://github.com/SimWook/workflow-visualizer/releases/latest) から `.dmg` をダウンロード
+2. `.dmg` を開き、アプリをApplicationsにドラッグ
+3. **重要**: コード署名されていないため、macOS Gatekeeper がブロックします。以下のコマンドで隔離属性を解除してください:
+
+```bash
+xattr -cr "/Applications/Workflow Visualizer.app"
+```
+
+4. これでアプリを通常通り開けます
+
+> **「Workflow Visualizer は壊れているため開けません」** と表示される場合は、インターネットからダウンロードした未署名アプリに対するmacOSの制限です。上記の `xattr -cr` コマンドで解決します。
+
+#### Windows
+
+1. [Releases](https://github.com/SimWook/workflow-visualizer/releases/latest) から `.msi` または `.exe` をダウンロード
+2. インストーラーを実行
+3. Windows SmartScreen の警告が出たら「詳細情報」→「実行」をクリック
 
 ### 開発
 
