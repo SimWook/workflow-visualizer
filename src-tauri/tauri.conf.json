@@ -43,7 +43,6 @@
     "windows": {
       "nsis": {
         "installMode": "perUser",
-        "languages": ["Japanese", "English"],
         "displayLanguageSelector": true
       }
     }
