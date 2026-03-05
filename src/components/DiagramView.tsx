@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { ZoomIn, ZoomOut, Maximize, RotateCcw } from 'lucide-react';
 import { useWorkflowStore } from '../stores/workflow-store';
 import { useMermaidRenderer } from '../hooks/useMermaidRenderer';
+import { THEME_DEFAULTS } from '../lib/theme-defaults';
 
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 5;
@@ -16,6 +17,7 @@ interface Position {
 export function DiagramView(): React.ReactElement {
   const mermaidCode = useWorkflowStore((s) => s.mermaidCode);
   const theme = useWorkflowStore((s) => s.theme);
+  const diagramBgColor = useWorkflowStore((s) => s.diagramBgColor);
 
   const { containerRef, error } = useMermaidRenderer(mermaidCode, theme);
 
@@ -26,7 +28,8 @@ export function DiagramView(): React.ReactElement {
   const positionStartRef = useRef<Position>({ x: 0, y: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
 
-  // ズームをスケール中心にクランプ
+  const themeColors = THEME_DEFAULTS[theme];
+
   const clampScale = useCallback((s: number): number => {
     return Math.min(MAX_SCALE, Math.max(MIN_SCALE, s));
   }, []);
@@ -44,7 +47,6 @@ export function DiagramView(): React.ReactElement {
     setPosition({ x: 0, y: 0 });
   }, []);
 
-  // フィット：SVGをビューポートに合わせる
   const handleFit = useCallback(() => {
     const viewport = viewportRef.current;
     const container = containerRef.current;
@@ -56,7 +58,6 @@ export function DiagramView(): React.ReactElement {
     const svgRect = svg.getBoundingClientRect();
     const viewRect = viewport.getBoundingClientRect();
 
-    // 現在のスケールで割って元サイズを取得
     const naturalWidth = svgRect.width / scale;
     const naturalHeight = svgRect.height / scale;
 
@@ -71,7 +72,6 @@ export function DiagramView(): React.ReactElement {
     setPosition({ x: 0, y: 0 });
   }, [containerRef, scale, clampScale]);
 
-  // Ctrl/Cmd + ホイールでズーム
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -88,10 +88,8 @@ export function DiagramView(): React.ReactElement {
     return () => viewport.removeEventListener('wheel', handleWheel);
   }, [clampScale]);
 
-  // ドラッグ開始
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
-      // 中クリックまたは左クリックでドラッグ
       if (e.button !== 0 && e.button !== 1) return;
       setIsDragging(true);
       dragStartRef.current = { x: e.clientX, y: e.clientY };
@@ -118,7 +116,6 @@ export function DiagramView(): React.ReactElement {
     setIsDragging(false);
   }, []);
 
-  // mermaidCodeが変わったらリセット
   useEffect(() => {
     setScale(1);
     setPosition({ x: 0, y: 0 });
@@ -146,43 +143,60 @@ export function DiagramView(): React.ReactElement {
 
   return (
     <div className="relative flex h-full flex-col">
-      {/* ズームコントロール */}
-      <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-lg border border-gray-200 bg-white/90 px-1 py-1 shadow-sm backdrop-blur-sm">
+      {/* ズームコントロール: テーマに応じた配色を適用 */}
+      <div
+        className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-lg px-1 py-1 shadow-sm backdrop-blur-sm"
+        style={{
+          backgroundColor: themeColors.controlBg,
+          borderColor: themeColors.controlBorder,
+          border: `1px solid ${themeColors.controlBorder}`,
+        }}
+      >
         <button
           onClick={handleZoomOut}
-          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="rounded p-1.5 transition-colors"
+          style={{ color: themeColors.controlText }}
           title="縮小"
         >
           <ZoomOut className="h-4 w-4" />
         </button>
-        <span className="min-w-[3rem] text-center text-xs tabular-nums text-gray-600">
+        <span
+          className="min-w-[3rem] text-center text-xs tabular-nums"
+          style={{ color: themeColors.controlText }}
+        >
           {scalePercent}%
         </span>
         <button
           onClick={handleZoomIn}
-          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="rounded p-1.5 transition-colors"
+          style={{ color: themeColors.controlText }}
           title="拡大"
         >
           <ZoomIn className="h-4 w-4" />
         </button>
-        <div className="mx-0.5 h-4 w-px bg-gray-200" />
+        <div
+          className="mx-0.5 h-4 w-px"
+          style={{ backgroundColor: themeColors.controlBorder }}
+        />
         <button
           onClick={handleFit}
-          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="rounded p-1.5 transition-colors"
+          style={{ color: themeColors.controlText }}
           title="画面にフィット"
         >
           <Maximize className="h-4 w-4" />
         </button>
         <button
           onClick={handleReset}
-          className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="rounded p-1.5 transition-colors"
+          style={{ color: themeColors.controlText }}
           title="リセット (100%)"
         >
           <RotateCcw className="h-4 w-4" />
         </button>
       </div>
 
-      {/* ダイアグラム表示エリア */}
+      {/* ダイアグラム表示エリア: diagramBgColor を背景色に適用 */}
       <div
         ref={viewportRef}
         className="diagram-viewport flex-1 overflow-hidden"
@@ -190,7 +204,10 @@ export function DiagramView(): React.ReactElement {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        style={{
+          cursor: isDragging ? 'grabbing' : 'grab',
+          backgroundColor: diagramBgColor,
+        }}
       >
         <div
           className="flex h-full w-full items-center justify-center"

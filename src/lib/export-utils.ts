@@ -25,6 +25,7 @@ export async function downloadPng(
   svgElement: SVGElement,
   filename = 'workflow.png',
   scale = 2,
+  backgroundColor = '#ffffff',
 ): Promise<void> {
   const serializer = new XMLSerializer();
   let svgString = serializer.serializeToString(svgElement);
@@ -45,8 +46,16 @@ export async function downloadPng(
       canvas.width = img.naturalWidth * scale;
       canvas.height = img.naturalHeight * scale;
 
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get 2D canvas context'));
+        return;
+      }
+
       ctx.scale(scale, scale);
+      // @MX:NOTE: PNG エクスポート時に背景色を塗りつぶす。デフォルトは白。
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight);
       ctx.drawImage(img, 0, 0);
 
       canvas.toBlob((blob) => {

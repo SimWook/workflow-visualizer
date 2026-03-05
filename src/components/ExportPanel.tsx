@@ -14,6 +14,7 @@ interface ExportButton {
 
 export function ExportPanel() {
   const mermaidCode = useWorkflowStore((s) => s.mermaidCode);
+  const diagramBgColor = useWorkflowStore((s) => s.diagramBgColor);
   const [statuses, setStatuses] = useState<Record<string, Status>>({});
 
   function getSvgElement(): SVGElement | null {
@@ -64,7 +65,7 @@ export function ExportPanel() {
       action: async () => {
         const svg = getSvgElement();
         if (!svg) return;
-        await downloadPng(svg);
+        await downloadPng(svg, 'workflow.png', 2, diagramBgColor);
         setStatus('png', 'success');
       },
     },

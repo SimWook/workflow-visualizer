@@ -20,12 +20,25 @@ export function SettingsBar() {
   const direction = useWorkflowStore((s) => s.direction);
   const enableSwimlanes = useWorkflowStore((s) => s.enableSwimlanes);
   const theme = useWorkflowStore((s) => s.theme);
+  const diagramBgColor = useWorkflowStore((s) => s.diagramBgColor);
+  const isCustomBgColor = useWorkflowStore((s) => s.isCustomBgColor);
   const setDiagramType = useWorkflowStore((s) => s.setDiagramType);
   const setDirection = useWorkflowStore((s) => s.setDirection);
   const setEnableSwimlanes = useWorkflowStore((s) => s.setEnableSwimlanes);
   const setTheme = useWorkflowStore((s) => s.setTheme);
+  const setDiagramBgColor = useWorkflowStore((s) => s.setDiagramBgColor);
+  const setIsCustomBgColor = useWorkflowStore((s) => s.setIsCustomBgColor);
 
   const isFlowchart = diagramType === 'flowchart';
+
+  const handleBgColorChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setDiagramBgColor(e.target.value);
+    setIsCustomBgColor(true);
+  };
+
+  const handleBgColorReset = (): void => {
+    setIsCustomBgColor(false);
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-4 border-b border-gray-200 bg-gray-50 px-6 py-2 text-sm">
@@ -97,6 +110,28 @@ export function SettingsBar() {
           ))}
         </select>
       </label>
+
+      <div className="flex items-center gap-2">
+        <span className="font-medium text-gray-600">背景色:</span>
+        <div className="flex items-center gap-1">
+          <input
+            type="color"
+            value={diagramBgColor}
+            onChange={handleBgColorChange}
+            className="h-6 w-8 cursor-pointer rounded border border-gray-300 p-0.5"
+            title="背景色を選択"
+          />
+          {isCustomBgColor && (
+            <button
+              onClick={handleBgColorReset}
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 hover:text-gray-700"
+              title="テーマデフォルトに戻す"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

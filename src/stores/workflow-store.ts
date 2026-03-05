@@ -3,6 +3,7 @@ import type { Direction, MermaidTheme, PreviewTab, ValidationMessage } from '../
 import type { DiagramRow, DiagramOptions } from '../diagrams/types';
 import type { DiagramType } from '../diagrams/types';
 import { diagramRegistry } from '../diagrams/index';
+import { THEME_DEFAULTS } from '../lib/theme-defaults';
 
 interface WorkflowState {
   rows: DiagramRow[];
@@ -13,6 +14,8 @@ interface WorkflowState {
   mermaidCode: string;
   messages: ValidationMessage[];
   activeTab: PreviewTab;
+  diagramBgColor: string;
+  isCustomBgColor: boolean;
 
   setRows: (rows: DiagramRow[]) => void;
   setDiagramType: (type: DiagramType) => void;
@@ -20,6 +23,8 @@ interface WorkflowState {
   setEnableSwimlanes: (v: boolean) => void;
   setTheme: (t: MermaidTheme) => void;
   setActiveTab: (t: PreviewTab) => void;
+  setDiagramBgColor: (color: string) => void;
+  setIsCustomBgColor: (v: boolean) => void;
   recompute: () => void;
 }
 
@@ -39,6 +44,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   mermaidCode: '',
   messages: [],
   activeTab: 'diagram',
+  // @MX:NOTE: テーマ変更時に自動更新される。isCustomBgColor が true の場合はユーザー指定色を維持する。
+  diagramBgColor: THEME_DEFAULTS['default'].bg,
+  isCustomBgColor: false,
 
   setRows: (rows) => {
     set({ rows });
@@ -62,11 +70,28 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   },
 
   setTheme: (t) => {
-    set({ theme: t });
+    const { isCustomBgColor } = get();
+    if (isCustomBgColor) {
+      set({ theme: t });
+    } else {
+      set({ theme: t, diagramBgColor: THEME_DEFAULTS[t].bg });
+    }
   },
 
   setActiveTab: (t) => {
     set({ activeTab: t });
+  },
+
+  setDiagramBgColor: (color) => {
+    set({ diagramBgColor: color });
+  },
+
+  setIsCustomBgColor: (v) => {
+    set({ isCustomBgColor: v });
+    if (!v) {
+      const { theme } = get();
+      set({ diagramBgColor: THEME_DEFAULTS[theme].bg });
+    }
   },
 
   recompute: () => {
